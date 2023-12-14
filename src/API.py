@@ -2,11 +2,11 @@ import json
 import os
 from abc import ABC, abstractmethod
 from typing import Mapping
-from _typeshed import SupportsItems
 
 import requests
 from dotenv import load_dotenv
-
+from pprint import pprint
+from src.vacancies import Vacancy
 load_dotenv()
 
 PAGE_COUNT = 5
@@ -19,10 +19,6 @@ class APIGetVacancies(ABC):
     def get_vacancies(self) -> list:
         pass
 
-    @abstractmethod
-    def make_list_vacancies(self, data: list) -> list:
-        pass
-
 
 class HeadHunterAPI(APIGetVacancies):
     """Класс для работы с API сайта HeadHunter"""
@@ -33,8 +29,8 @@ class HeadHunterAPI(APIGetVacancies):
 
         self.key_word = key_word
         self.__page = 0
-        self.__params: SupportsItems = {"text": key_word, "area": 113, "page": self.__page,
-                                        "per_page": 100}  # "area": 113 = поиск по России
+        self.__params = {"text": key_word, "area": 113, "page": self.__page,
+                         "per_page": 100}  # "area": 113 = поиск по России
 
     def get_vacancies(self) -> list:
         """Метод получения вакансий по заданным параметрам"""
@@ -45,9 +41,10 @@ class HeadHunterAPI(APIGetVacancies):
             req.close()
             list_data.extend(json.loads(data)["items"])
             self.__page += 1
-        return list_data
+        return self.make_list_vacancies(list_data)
 
-    def make_list_vacancies(self, data_from_hh: list) -> list:
+    @staticmethod
+    def make_list_vacancies(data_from_hh: list) -> list:
         """Метод обработки полученной с API информации по вакансиям
         :param data_from_hh: полученная с сайта HeadHunter информация в виде списка
         :return list_vacancies: новый список в виде списка словарей: {'id_vacancy': id вакансии, 'town': город,
@@ -95,7 +92,7 @@ class SuperJobAPI(APIGetVacancies):
         :param key_word: ключевое слово для поиска вакансии"""
         self.key_word = key_word
         self.__page = 0
-        self.params: SupportsItems = {"keyword": key_word, "country": 1, "page": self.__page, "count": 100}
+        self.params = {"keyword": key_word, "country": 1, "page": self.__page, "count": 100}
 
     def get_vacancies(self) -> list:
         """Метод получения вакансий по заданным параметрам"""
@@ -106,9 +103,10 @@ class SuperJobAPI(APIGetVacancies):
             req.close()
             list_data.extend(json.loads(data)["objects"])
             self.__page += 1
-        return list_data
+        return self.make_list_vacancies(list_data)
 
-    def make_list_vacancies(self, data_from_sj: list) -> list:
+    @staticmethod
+    def make_list_vacancies(data_from_sj: list) -> list:
         """Метод обработки полученной с API информации по вакансиям
         :param data_from_sj: полученная с сайта HeadHunter информация в виде списка
         :return list_vacancies: новый список в виде списка словарей: {'id_vacancy': id вакансии, 'town': город,
@@ -128,7 +126,7 @@ class SuperJobAPI(APIGetVacancies):
                 salary = 0
             vacancy_data = {
                 "id_vacancy": i["id"],
-                "town": i["town"],
+                "town": i["town"]['title'],
                 "name": i["profession"],
                 "url": i["link"],
                 "salary": salary,

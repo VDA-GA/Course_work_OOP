@@ -1,3 +1,4 @@
+from __future__ import annotations
 from typing import List, Any
 
 
@@ -39,13 +40,15 @@ class Vacancy:
         else:
             self.__salary = int(salary)
 
+
+
     def __repr__(self) -> str:
         return (
-            f"{self.__class__.__name__}({self.id_vacancy}, '{self.name}', {self.town}, {self.url}, {self.salary})"
+            f"{self.__class__.__name__}({self.id_vacancy}, '{self.name}', {self.town}, {self.url}, {self.__salary})"
         )
 
     def __str__(self) -> str:
-        return f"{self.name}"
+        return f"{self.name}, {self.__salary}"
 
     @classmethod
     def instantiate_data(cls, list_vacancies: list) -> None:
@@ -60,14 +63,23 @@ class Vacancy:
             url = vacancy['url']
             salary = vacancy['salary']
             schedule = vacancy['schedule']
-            description = vacancy['description']
+            if not vacancy['description']:
+                description = '-'
+            else:
+                description = vacancy['description']
             cls(id_vacancy, town, name, url, salary, schedule, description)
 
-    def __lt__(self, other: Any) -> Any:
+    def __lt__(self, other: object) -> Any:
+        if not isinstance(other, Vacancy):
+            return NotImplemented
         return self.__salary < other.__salary
 
-    def __le__(self, other: Any) -> Any:
+    def __le__(self, other: object) -> Any:
+        if not isinstance(other, Vacancy):
+            return NotImplemented
         return self.__salary <= other.__salary
 
-    def __eq__(self, other: Any) -> Any:
+    def __eq__(self, other: object) -> Any:
+        if not isinstance(other, Vacancy):
+            return NotImplemented
         return self.__salary == other.__salary
