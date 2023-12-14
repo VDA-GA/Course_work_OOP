@@ -1,14 +1,15 @@
 from __future__ import annotations
-from typing import List, Any
+
+from typing import Any, List
 
 
 class Vacancy:
-    """Класс для вакансий."""
+    """Класс для работы с вакансиями полученных с внешних источников."""
     list_vacancies: List = []
 
     def __init__(self, id_vacancy: int, town: str, name: str, url: str, salary: int, schedule: str, description: str):
         """
-                Создание экземпляра класса Vacancy.
+                Инициализатор экземпляра класса Vacancy.
                 :param id_vacancy: id вакансии на сайте.
                 :param town: Город вакансии.
                 :param name: Наименование вакансии.
@@ -27,24 +28,28 @@ class Vacancy:
         self.list_vacancies.append(self)
 
     @property
-    def id_vacancy(self):
+    def id_vacancy(self) -> int:
+        """Геттер для id_vacancy"""
         return self.__id_vacancy
 
     @id_vacancy.setter
-    def id_vacancy(self, id):
-        if isinstance(id, int):
-            self.__id_vacancy = id
-        elif isinstance(id, str) and id.isdigit():
-            self.__id_vacancy = int(id)
+    def id_vacancy(self, id_vacancy: Any) -> None:
+
+        if isinstance(id_vacancy, int):
+            self.__id_vacancy = id_vacancy
+        elif isinstance(id_vacancy, str) and id_vacancy.isdigit():
+            self.__id_vacancy = int(id_vacancy)
         else:
             raise ValueError('Неверно указан id')
 
     @property
     def salary(self) -> int:
+        """Геттер для зарплаты"""
         return self.__salary
 
     @salary.setter
     def salary(self, salary: str | int) -> None:
+        """Сеттер для salary"""
         if isinstance(salary, str) and '-' in salary:
             list_salary = salary.split('-')
             self.__salary = int(list_salary[1])
@@ -52,8 +57,6 @@ class Vacancy:
             self.__salary = int(salary)
         else:
             self.__salary = int(salary)
-
-
 
     def __repr__(self) -> str:
         return (

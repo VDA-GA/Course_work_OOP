@@ -1,6 +1,8 @@
-import pytest
-from src.API import HeadHunterAPI, SuperJobAPI
 import json
+
+import pytest
+
+from src.API import HeadHunterAPI, SuperJobAPI
 
 
 @pytest.fixture

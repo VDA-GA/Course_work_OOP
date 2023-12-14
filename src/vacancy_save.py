@@ -1,10 +1,12 @@
 from __future__ import annotations
-from typing import Any, List
+
 import json
+import os
 from abc import ABC, abstractmethod
 from pathlib import Path
+from typing import Any, List
+
 from src.vacancies import Vacancy
-import os
 
 
 class Saver(ABC):
@@ -24,23 +26,24 @@ class Saver(ABC):
 
 class JSONSaver(Saver):
 
-    def __init__(self, filename):
+    def __init__(self, filename: str) -> None:
         self.filename = Path(Path(Path.cwd()).parent, 'data', filename)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"{self.__class__.__name__}({self.filename})"
 
-    def __call__(self, *args, **kwargs):
+    def __call__(self, *args: list | dict) -> Any:
         if args:
             self.write_data_to_file(args[0])
-            return self.get_data_from_file(self.filename)
+            return self.get_data_from_file()
         else:
-            return self.get_data_from_file(self.filename)
+            return self.get_data_from_file()
 
-    @staticmethod
-    def get_data_from_file(filename: Path) -> Any:
+    def get_data_from_file(self) -> Any:
+        """Метод для получения данных из файла
+        :return: возвращает список словарей с данными по вакансиям"""
         try:
-            with open(filename, 'r', encoding='utf-8') as file:
+            with open(self.filename, 'r', encoding='utf-8') as file:
                 list_vacancies = json.load(file)
             return list_vacancies
         except FileNotFoundError:
@@ -51,10 +54,14 @@ class JSONSaver(Saver):
             return []
 
     def write_data_to_file(self, data: dict | list) -> None:
+        """Метод для записи данных в файл"""
         with open(self.filename, 'w', encoding='utf-8') as file:
             json.dump(data, file, ensure_ascii=False)
 
     def add_vacancy(self, vacancy: Vacancy) -> None:
+        """Метод добавляющий вакансию в файл
+        :param vacancy: экземпляр класса Vacancy"""
+
         new_vacancy_dict = dict(id_vacancy=vacancy.id_vacancy, town=vacancy.town, name=vacancy.name, url=vacancy.url,
                                 salary=vacancy.salary, schedule=vacancy.schedule, description=vacancy.description)
         if os.path.exists(self.filename) and os.stat(self.filename).st_size != 0:
@@ -69,7 +76,10 @@ class JSONSaver(Saver):
             self(new_vacancy_dict)
 
     def delete_vacancy(self, vacancy: Vacancy) -> None:
-        list_vacancies = self.get_data_from_file(self.filename)
+        """Метод удаляющий вакансию из файла
+                :param vacancy: экземпляр класса Vacancy"""
+
+        list_vacancies = self()
         dict_vacancy = dict(id_vacancy=vacancy.id_vacancy, town=vacancy.town, name=vacancy.name, url=vacancy.url,
                             salary=vacancy.salary, schedule=vacancy.schedule, description=vacancy.description)
         if isinstance(list_vacancies, dict) and list_vacancies == dict_vacancy:
@@ -83,16 +93,17 @@ class JSONSaver(Saver):
             except ValueError:
                 print('Указанная вакансия отсутствует')
             finally:
-                self.write_data_to_file(list_vacancies)
+                self(list_vacancies)
         else:
             return
 
-    def get_vacancies_by_salary(self, salary_period: str) -> List | None:
+    def get_vacancies_by_salary(self, salary_period: str) -> List:
+        """Метод осуществляющий фильтрацию данных по вакансиям из файла
+                :param salary_period: диапазон значений зарплат"""
         if '-' in salary_period:
-            salary_list = salary_period.split('-')
+            salary_list: list = salary_period.split('-')
         else:
             print('Неверно указан диапазон зарплат')
-            return
-        list_vacancies = self.get_data_from_file(self.filename)
+        list_vacancies = self()
         new_list_vacancies = [i for i in list_vacancies if int(salary_list[0]) <= i['salary'] <= int(salary_list[1])]
         return new_list_vacancies

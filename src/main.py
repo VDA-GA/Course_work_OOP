@@ -1,12 +1,14 @@
+from typing import Any
+
 from src.API import HeadHunterAPI, SuperJobAPI
+from src.utils import filter_vacancies_by_key_word
 from src.vacancies import Vacancy
 from src.vacancy_save import JSONSaver
-from src.utils import get_vacancies_by_town, filter_vacancies_by_key_word
-import pandas as pd
-from pprint import pprint
 
 
-def main():
+def main() -> Any:
+    """Основная функция программы"""
+
     print("Добрый день, Вам помочь найти работу?")
     while True:
         answer1 = input('да/нет? \n')
@@ -75,6 +77,7 @@ def main():
         print('"Нет вакансий, соответствующих заданным критериям."')
     else:
         print(f'Топ вакансий: {sorted_new_list[0:top_n]}')
+    return sorted_new_list
 
 
 if __name__ == "__main__":

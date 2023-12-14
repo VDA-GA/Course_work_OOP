@@ -1,6 +1,8 @@
-from src.vacancies import Vacancy
-import pytest
 import json
+
+import pytest
+
+from src.vacancies import Vacancy
 
 
 @pytest.fixture
