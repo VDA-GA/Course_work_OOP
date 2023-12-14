@@ -17,7 +17,7 @@ class Vacancy:
                 :param schedule: График работы.
                 :param description: Описание вакансии.
                 """
-        self.id_vacancy = id_vacancy
+        self.__id_vacancy = id_vacancy
         self.name = name
         self.town = town
         self.url = url
@@ -25,6 +25,19 @@ class Vacancy:
         self.schedule = schedule
         self.description = description
         self.list_vacancies.append(self)
+
+    @property
+    def id_vacancy(self):
+        return self.__id_vacancy
+
+    @id_vacancy.setter
+    def id_vacancy(self, id):
+        if isinstance(id, int):
+            self.__id_vacancy = id
+        elif isinstance(id, str) and id.isdigit():
+            self.__id_vacancy = int(id)
+        else:
+            raise ValueError('Неверно указан id')
 
     @property
     def salary(self) -> int:

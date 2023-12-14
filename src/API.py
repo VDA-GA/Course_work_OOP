@@ -7,6 +7,7 @@ import requests
 from dotenv import load_dotenv
 from pprint import pprint
 from src.vacancies import Vacancy
+
 load_dotenv()
 
 PAGE_COUNT = 5
@@ -31,6 +32,9 @@ class HeadHunterAPI(APIGetVacancies):
         self.__page = 0
         self.__params = {"text": key_word, "area": 113, "page": self.__page,
                          "per_page": 100}  # "area": 113 = поиск по России
+
+    def __repr__(self):
+        return f'{self.__class__.__name__}({self.key_word})'
 
     def get_vacancies(self) -> list:
         """Метод получения вакансий по заданным параметрам"""
@@ -66,7 +70,7 @@ class HeadHunterAPI(APIGetVacancies):
             else:
                 salary = 0
             vacancy_data = {
-                "id_vacancy": i["id"],
+                "id_vacancy": int(i["id"]),
                 "town": i["area"]["name"],
                 "name": i["name"],
                 "url": i["alternate_url"],
@@ -93,6 +97,9 @@ class SuperJobAPI(APIGetVacancies):
         self.key_word = key_word
         self.__page = 0
         self.params = {"keyword": key_word, "country": 1, "page": self.__page, "count": 100}
+
+    def __repr__(self):
+        return f'{self.__class__.__name__}({self.key_word})'
 
     def get_vacancies(self) -> list:
         """Метод получения вакансий по заданным параметрам"""
